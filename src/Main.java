@@ -2,7 +2,10 @@ import java.util.Scanner;
 
 public class Main {
     static Scanner reader;
+
+
     public static void main(String[] args) {
+
         ExecuteProccess();
     }
     private static void PrintOptions()
@@ -17,35 +20,50 @@ public class Main {
 
     private static void ExecuteProccess()
     {
+        AddressBook addressBook = new AddressBook();
         try {
-            functions function = new functions();
+
             reader = new Scanner(System.in);
+
+            addressBook.load();
 
             PrintOptions();
             boolean inputExit = false;
             while (!inputExit) {
                 switch (reader.nextInt()) {
                     case 1:
-                        function.ViewContacts();
+                        var contacts = addressBook.list();
+                        if (!contacts.isEmpty()) {
+                          for (String contact : contacts.keySet()) {
+                              System.out.println("> " + contact + " : " + contacts.get(contact));
+                           }
+                        }
+                        else {
+                            System.out.println("No hay contactos disponibles para mostrar.");
+                        }
+                        PrintOptions();
                         break;
                     case 2:
-                      var addContact = function.AddContac();
-                      if (addContact) {
-                          System.out.println("Contacto añadido correctamente.");
-                      }
-                      else {
-                          System.out.println("Error al guardar contacto.");
-                      }
+                        var createContact = addressBook.Create();
+                        if (createContact)
+                        {
+                            System.out.println("Contacto agregado correctamente");
+                        }
+                        else {
+                            System.out.println("No se agregó el contacto.");
+                        }
+                        PrintOptions();
                         break;
                     case 3:
-                        var deleteContact = function.DeleteContact();
-                        if (deleteContact){
-                            System.out.println("Contacto borrado correctamente");
-                        }
-                        else
-                        {
-                            ExecuteProccess();
-                        }
+                            boolean deleteContact = addressBook.Delete();
+                            if (deleteContact){
+                                System.out.println("Contacto Eliminado correctament.");
+                            }
+                            else
+                            {
+                                System.out.println("No se eliminó el contacto.");
+                            }
+                            PrintOptions();
                         break;
                     case 4:
                         inputExit = true;
@@ -59,6 +77,12 @@ public class Main {
         }catch (Exception ex){
             System.out.println("Ingresa un valor númerico.");
             ExecuteProccess();
+        }
+        finally {
+           boolean result = addressBook.Save();
+           if (result) {
+               System.out.println("Contactos guardados en archivo correctamente");
+           }
         }
     }
 }
